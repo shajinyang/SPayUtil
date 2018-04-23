@@ -1,1 +1,1 @@
-include ':app', ':spaylibrary'
+include ':app', ':spaylibrary', ':baserecycleview'

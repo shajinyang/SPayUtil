@@ -3,6 +3,7 @@ package com.zx.xsk.spayutil;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 
 import com.zx.xsk.nethelper.BaseSubscriber;
 import com.zx.xsk.nethelper.HttpResult;
@@ -21,7 +22,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getNet();
+        findViewById(R.id.ali_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getNet();
+            }
+        });
+        findViewById(R.id.wx_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getWxNet();
+            }
+        });
     }
 
     private void getNet(){
@@ -48,30 +60,49 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onNextNet(HttpResult<AliConfigBean> stringHttpResult) {
-                       /* new AliPayHelper
-                                .PBuilder()
-                                .setAppId(stringHttpResult.data.getPARTNER())
-                                .setPid(stringHttpResult.data.getSELLER())
-                                .setRs2(stringHttpResult.data.getRSA_PRIVATE())
-                                .setBody("")
-                                .setSubject("测试")
-                                .setTotalMoney("0.01")
-                                .setTradeNo("637366373663736")
-                                .setTargetId("737363")
-                                .create()
-                                .pay(MainActivity.this);*/
+                        new AliPayHelper().pay(MainActivity.this,"");
 
+                    }
+
+                });
+    }
+    private void getWxNet(){
+        NetHelper.getInstance()
+                .create(ApiService.class)
+                .wxConfig()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new BaseSubscriber<WxResBean>() {
+                    @Override
+                    public void onStartNet() {
+
+                    }
+
+                    @Override
+                    public void onErrorNet(Throwable throwable) {
+
+                    }
+
+                    @Override
+                    public void onCompletedNet() {
+
+                    }
+
+                    @Override
+                    public void onNextNet(WxResBean wxResBean) {
                         new WxPayHelper
                                 .PBuilder()
-                                .setAppId("wxf8b4f85f3a794e77")
+                                .setAppId(wxResBean.getAppid())
                                 .setNonceStr("测试")
-                                .setPartnerId("123243243")
-                                .setPrePayId("2324353454654")
-                                .setSign("424eerer3243dfsfer43")
+                                .setPartnerId(wxResBean.getPartnerid())
+                                .setPrePayId(wxResBean.getPrepayid())
+                                .setSign(wxResBean.getSign())
                                 .create()
                                 .pay(MainActivity.this);
                     }
 
                 });
     }
+
+
 }

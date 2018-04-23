@@ -6,6 +6,7 @@ import java.util.Map;
 
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 import rx.Observable;
 
@@ -19,5 +20,8 @@ public interface ApiService {
     @FormUrlEncoded
     @POST("index/pay/get_ali_config")
     Observable<HttpResult<AliConfigBean>> alipayconfig(@FieldMap Map<String,Object> parms);
+
+    @GET("http://wxpay.wxutil.com/pub_v2/app/app_pay.php")
+    Observable<WxResBean> wxConfig();
 
 }

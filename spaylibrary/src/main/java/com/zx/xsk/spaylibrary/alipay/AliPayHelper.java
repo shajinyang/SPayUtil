@@ -62,135 +62,25 @@ public class AliPayHelper {
     };
 
 
-    private  AliPayHelper(String appid, String pid, String targetid, String rs2, String rs,OrderBean orderBean){
-        ConfigData.setAPPID(appid);
-        ConfigData.setPID(pid);
-        ConfigData.setTargetId(targetid);
-        ConfigData.setRsa2Private(rs2);
-        ConfigData.setRsaPrivate(rs);
-        this.orderBean=orderBean;
-    }
-
-    public  void pay(final Activity mContext){
+    public void pay(final Activity mContext,String orderInfo){
         activity=mContext;
-        if (TextUtils.isEmpty(ConfigData.APPID) || (TextUtils.isEmpty(ConfigData.RSA2_PRIVATE) && TextUtils.isEmpty(ConfigData.RSA_PRIVATE))) {
-            new AlertDialog.Builder(mContext).setTitle("警告").setMessage("需要配置APPID | RSA_PRIVATE")
-                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialoginterface, int i) {
-                            //
-                            mContext.finish();
-                        }
-                    }).show();
-            return;
-        }
-
-        /**
-         * 这里只是为了方便直接向商户展示支付宝的整个支付流程；所以Demo中加签过程直接放在客户端完成；
-         * 真实App里，privateKey等数据严禁放在客户端，加签过程务必要放在服务端完成；
-         * 防止商户私密数据泄露，造成不必要的资金损失，及面临各种安全风险；
-         *
-         * orderInfo的获取必须来自服务端；
-         */
-        boolean rsa2 = (ConfigData.RSA2_PRIVATE.length() > 0);
-        Map<String, String> params = OrderInfoUtil2_0.buildOrderParamMap(ConfigData.APPID, rsa2,orderBean);
-        String orderParam = OrderInfoUtil2_0.buildOrderParam(params);
-
-        String privateKey = rsa2 ? ConfigData.RSA2_PRIVATE : ConfigData.RSA_PRIVATE;
-        String sign = OrderInfoUtil2_0.getSign(params, privateKey, rsa2);
-        final String orderInfo = orderParam + "&" + sign;
-
+        orderInfo ="alipay_sdk=alipay-sdk-java-dynamicVersionNo&app_id=2088511789134513&biz_content=%7B%22body%22%3A%22%CE%D2%CA%C7%B2%E2%CA%D4%CA%FD%BE%DD%22%2C%22out_trade_no%22%3A%2212323455657%22%2C%22product_code%22%3A%22QUICK_MSECURITY_PAY%22%2C%22subject%22%3A%22App%D6%A7%B8%B6%B2%E2%CA%D4Java%22%2C%22timeout_express%22%3A%2230m%22%2C%22total_amount%22%3A%220.01%22%7D&charset=GBK&format=json&method=alipay.trade.app.pay&notify_url=%C9%CC%BB%A7%CD%E2%CD%F8%BF%C9%D2%D4%B7%C3%CE%CA%B5%C4%D2%EC%B2%BD%B5%D8%D6%B7&sign=PXLr%2BhIx0S%2FRuD1I7sHTKCyaMdL68odaRGoqP84A3CZoXdzOkzOik%2FmmFuSIWoSJSodxPapp8Z2YS0S2yGiBuAs79L9qpGBWMbyBLLPy8pnWNECyV4%2BiSaxCo46gi8abwKLeXimgq5AYtijwHlSRmhNtWhLZhXcsC75WxBAz5cQ%3D&sign_type=RSA2&timestamp=2018-03-12+15%3A44%3A31&version=1.0";
+        final String finalOrderInfo = orderInfo;
         Runnable payRunnable = new Runnable() {
-
             @Override
             public void run() {
                 PayTask alipay = new PayTask(activity);
-                Map<String, String> result = alipay.payV2(orderInfo, true);
+                Map<String, String> result = alipay.payV2(finalOrderInfo, true);
                 Log.i("msp", result.toString());
-
                 Message msg = new Message();
                 msg.what = SDK_PAY_FLAG;
                 msg.obj = result;
                 mHandler.sendMessage(msg);
             }
         };
-
         Thread payThread = new Thread(payRunnable);
         payThread.start();
     }
 
-
-    /**
-     * 构建器，构建支付必须的参数
-     */
-    public static class PBuilder{
-       private String appid;
-       private  String pid;
-       private String targetid;
-       private String rs2;
-       private String rs;
-
-       private OrderBean orderBean;
-
-       public  PBuilder setAppId(String appid){
-           this.appid=appid;
-           return this;
-        }
-
-        public PBuilder setPid(String pid){
-           this.pid=pid;
-           return this;
-       }
-
-       public PBuilder setTargetId(String targetId){
-            this.targetid=targetId;
-            return this;
-       }
-
-       public PBuilder setRs2(String rs2){
-           this.rs2=rs2;
-           return this;
-       }
-
-       public PBuilder setRs(String rs){
-           this.rs=rs;
-           return this;
-       }
-
-       public PBuilder setTradeNo(String tradeNo){
-           if(orderBean==null){
-               orderBean=new OrderBean();
-           }
-           orderBean.setOut_trade_no(tradeNo);
-           return this;
-       }
-
-       public  PBuilder setSubject(String subject){
-           if(orderBean==null){
-               orderBean=new OrderBean();
-           }
-           orderBean.setSubject(subject);
-           return this;
-       }
-
-       public PBuilder setTotalMoney(String money){
-           if(orderBean==null){
-               orderBean=new OrderBean();
-           }
-           orderBean.setTotal_amount(money);
-           return this;
-       }
-
-       public PBuilder setBody(String body){
-           if(orderBean==null){
-               orderBean=new OrderBean();
-           }
-           orderBean.setBody(body);
-           return this;
-       }
-
-       public AliPayHelper create(){
-           return new AliPayHelper(appid,pid,targetid,rs2,rs,orderBean);
-       }
-    }
 
 }

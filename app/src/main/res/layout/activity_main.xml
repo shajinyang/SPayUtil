@@ -24,13 +24,15 @@
         android:text="支付宝支付"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="286dp" />
+        tools:layout_editor_absoluteY="286dp"
+        tools:ignore="MissingConstraints" />
 
     <ViewAnimator
         android:layout_width="368dp"
         android:layout_height="231dp"
         tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="8dp" />
+        tools:layout_editor_absoluteY="8dp"
+        tools:ignore="MissingConstraints" />
 
     <Button
         android:id="@+id/wx_btn"
@@ -38,7 +40,17 @@
         android:layout_height="wrap_content"
         android:text="微信支付"
         tools:layout_editor_absoluteX="148dp"
-        tools:layout_editor_absoluteY="344dp" />
+        tools:layout_editor_absoluteY="344dp"
+        tools:ignore="MissingConstraints" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Button"
+        tools:layout_editor_absoluteX="147dp"
+        tools:layout_editor_absoluteY="415dp"
+        tools:ignore="MissingConstraints" />
 
 
 </android.support.constraint.ConstraintLayout>
